@@ -1,0 +1,44 @@
+name: build-windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore .\src\DoubanAwardsCollector\DoubanAwardsCollector.csproj
+
+      - name: Build
+        run: dotnet build .\src\DoubanAwardsCollector\DoubanAwardsCollector.csproj -c Release --no-restore
+
+      - name: Publish win-x64
+        run: >
+          dotnet publish .\src\DoubanAwardsCollector\DoubanAwardsCollector.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -o .\artifacts\publish
+
+      - name: Package
+        shell: pwsh
+        run: |
+          Compress-Archive -Path .\artifacts\publish\* -DestinationPath .\artifacts\DoubanAwardsCollector-win-x64.zip -Force
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DoubanAwardsCollector-win-x64
+          path: .\artifacts\DoubanAwardsCollector-win-x64.zip
