@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://douban-plus.local/schemas/award-edition-v1.schema.json",
+  "title": "AwardEditionData v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "parserVersion",
+    "collectedAtUtc",
+    "source",
+    "event",
+    "edition",
+    "relatedEditions",
+    "categories"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "parserVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "collectedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "requestedUrl",
+        "finalUrl"
+      ],
+      "properties": {
+        "provider": {
+          "const": "douban"
+        },
+        "requestedUrl": {
+          "type": "string"
+        },
+        "finalUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slug",
+        "name",
+        "sourceTitle"
+      ],
+      "properties": {
+        "slug": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string"
+        },
+        "sourceTitle": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "edition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "year",
+        "title"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "year": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1800,
+          "maximum": 2200
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "relatedEditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "editionKey",
+          "year",
+          "label",
+          "url"
+        ],
+        "properties": {
+          "editionKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "year": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1800,
+            "maximum": 2200
+          },
+          "label": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "order",
+          "groupName",
+          "name",
+          "entries"
+        ],
+        "properties": {
+          "order": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "groupName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "order",
+                "result",
+                "subjects",
+                "people",
+                "image",
+                "rawText"
+              ],
+              "properties": {
+                "order": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "result": {
+                  "enum": [
+                    "winner",
+                    "nominee",
+                    "unknown"
+                  ]
+                },
+                "subjects": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "provider",
+                      "doubanId",
+                      "name",
+                      "url"
+                    ],
+                    "properties": {
+                      "provider": {
+                        "const": "douban"
+                      },
+                      "doubanId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "people": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "provider",
+                      "doubanId",
+                      "name",
+                      "url"
+                    ],
+                    "properties": {
+                      "provider": {
+                        "const": "douban"
+                      },
+                      "doubanId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "image": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "url",
+                        "alt",
+                        "kind",
+                        "doubanId"
+                      ],
+                      "properties": {
+                        "url": {
+                          "type": "string"
+                        },
+                        "alt": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "subject",
+                            "person",
+                            "unknown"
+                          ]
+                        },
+                        "doubanId": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "rawText": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
