@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.2 - Direct h3 award-category support
+
+- 修复豆瓣 Awards 页面存在 `h3 -> li` 直接挂奖项条目的结构时整组漏采的问题。
+- 典型案例：第64届威尼斯电影节的 `金狮奖 Golden Lion`。
+- 当 `h3` 后没有 `h4`、但出现有效奖项条目时，自动建立“组即类别”的隐式 Category：
+  - `groupName = h3 文本`
+  - `name = h3 文本`
+- 原有 `h3 -> h4 -> li` 解析逻辑保持不变。
+- `AwardEditionData v1` / JSON Schema / SQLite 结构均不变。
+- ParserVersion 升至 `1.0.2`，应用版本升至 `0.1.2`。
+
 ## 0.1.1 - Parser validation fixes
 
 - 修复 Event 名称清洗：`台北金马影展 的` 现在输出为 `台北金马影展`。

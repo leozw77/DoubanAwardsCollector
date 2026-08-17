@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <AssemblyName>DoubanAwardsCollector</AssemblyName>
     <RootNamespace>DoubanAwardsCollector</RootNamespace>
   </PropertyGroup>

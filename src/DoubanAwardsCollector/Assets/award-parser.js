@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const parserVersion = "1.0.1";
+  const parserVersion = "1.0.2";
   const normalizeText = (value) =>
     (value || "").replace(/\s+/gu, " ").replace(/\u00a0/gu, " ").trim();
 
@@ -249,7 +249,7 @@
       continue;
     }
 
-    if (!node.matches("li") || !currentCategory) {
+    if (!node.matches("li")) {
       continue;
     }
 
@@ -268,6 +268,29 @@
 
     if (subjects.length === 0 && people.length === 0 && !imageNode) {
       continue;
+    }
+
+    // Some Douban Awards groups are themselves the category:
+    //
+    //   h3  金狮奖 Golden Lion
+    //   li  色，戒 ... 获奖
+    //   li  ...
+    //
+    // There is no intermediate h4. In that layout, create an implicit
+    // category only when we actually encounter a valid award entry.
+    // This preserves the existing h3 -> h4 -> li behavior unchanged.
+    if (!currentCategory) {
+      if (!currentGroup) {
+        continue;
+      }
+
+      currentCategory = {
+        order: categories.length,
+        groupName: currentGroup,
+        name: currentGroup,
+        entries: [],
+      };
+      categories.push(currentCategory);
     }
 
     let result = "unknown";

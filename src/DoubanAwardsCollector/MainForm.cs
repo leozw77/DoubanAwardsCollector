@@ -20,7 +20,7 @@ public sealed class MainForm : Form
 
     public MainForm()
     {
-        Text = "Douban Awards Collector 0.1.1";
+        Text = "Douban Awards Collector 0.1.2";
         StartPosition = FormStartPosition.CenterScreen;
         Width = 1320;
         Height = 860;
