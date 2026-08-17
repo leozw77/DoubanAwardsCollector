@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const parserVersion = "1.0.0";
+  const parserVersion = "1.0.1";
   const normalizeText = (value) =>
     (value || "").replace(/\s+/gu, " ").replace(/\u00a0/gu, " ").trim();
 
@@ -41,7 +41,8 @@
     let value = title;
     value = value.replace(/\(\s*(?:19|20)\d{2}\s*\)/gu, " ");
     value = value.replace(/第\s*[0-9一二三四五六七八九十百零〇]+\s*届/gu, " ");
-    value = value.replace(/获奖名单|提名名单|完整名单|名单/gu, " ");
+    value = value.replace(/(?:的)?(?:获奖名单|提名名单|完整名单|名单)/gu, " ");
+    value = value.replace(/\s*的\s*$/u, " ");
     value = normalizeText(value);
     return value || slug;
   };
@@ -87,7 +88,10 @@
   const relatedEditions = [];
   const relatedSeen = new Set();
 
-  for (const anchor of content.querySelectorAll("a[href]")) {
+  // 豆瓣完整名单页底部的“历届…获奖名单”链接本身也是
+  // /awards/{slug}/{edition}/nominees?k=a，而不是届次主页。
+  // 只接受纯 4 位年份标签，避免把“回第XX届页面”等导航链接误收进来。
+  for (const anchor of content.querySelectorAll('a[href*="/awards/"]')) {
     let url;
     try {
       url = new URL(anchor.href, window.location.href);
@@ -96,33 +100,35 @@
     }
 
     const match = url.pathname.match(
-      /^\/awards\/([^/]+)\/([^/]+)\/?$/u
+      /^\/awards\/([^/]+)\/([^/]+)(?:\/nominees)?\/?$/u
     );
 
     if (!match || decodeURIComponent(match[1]) !== slug) {
       continue;
     }
 
-    const relatedKey = decodeURIComponent(match[2]);
     const label = normalizeText(anchor.textContent);
-
-    if (!label) {
+    if (!/^(?:19|20)\d{2}$/u.test(label)) {
       continue;
     }
 
-    const dedupeKey = `${relatedKey}|${url.href}`;
-    if (relatedSeen.has(dedupeKey)) {
+    const relatedKey = decodeURIComponent(match[2]);
+    if (relatedSeen.has(relatedKey)) {
       continue;
     }
-    relatedSeen.add(dedupeKey);
+    relatedSeen.add(relatedKey);
 
-    const yearMatch = label.match(/\b((?:19|20)\d{2})\b/u);
+    const normalizedUrl = new URL(
+      `/awards/${encodeURIComponent(slug)}/${encodeURIComponent(relatedKey)}/nominees`,
+      window.location.origin
+    );
+    normalizedUrl.searchParams.set("k", "a");
 
     relatedEditions.push({
       editionKey: relatedKey,
-      year: yearMatch ? Number(yearMatch[1]) : null,
+      year: Number(label),
       label,
-      url: url.href,
+      url: normalizedUrl.href,
     });
   }
 
